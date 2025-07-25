@@ -1,0 +1,11 @@
+# Ignore nixos build outputs
+/result
+/result-*
+
+# dotenv
+.env*
+!.envrc
+.direnv
+
+# VSCode plugin: Github Local Actions
+.secrets

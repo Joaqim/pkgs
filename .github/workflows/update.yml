@@ -1,0 +1,40 @@
+# Initially taken from [1]:
+# [1]: https://github.com/kachick/dotfiles/blob/main/.github/workflows/update-flake-lock-and-ci.yml
+name: Bump Flake Inputs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/update.yml'
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  schedule:
+    - cron: '5 3 * * 1' # Every Monday at 03:05 UTC
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  update:
+    if: (github.event_name != 'pull_request') || (!github.event.pull_request.draft) || (github.triggering_actor != 'dependabot[bot]')
+    uses: Joaqim/dotfiles/.github/workflows/reusable-bump-flake-lock-and-selfup.yml@main
+    with:
+      app-id: ${{ vars.APP_ID }}
+      dry-run: ${{ github.event_name == 'pull_request' }}
+      pr-title: 'Bump flake.lock and related dependencies'
+      pr-body: |
+        #### This PR has been created using @kachick's reusable workflow: [reusable-bump-flake-lock-and-selfup.yml][1]
+
+        #### This PR has successfully bumped nix flake inputs using the following command:
+        ```shell
+        nix flake update --commit-lock-file
+        ```
+
+        [1]: https://github.com/kachick/selfup/blob/main/.github/workflows/reusable-bump-flake-lock-and-selfup.yml
+
+        #### Do **NOT** work in the branch of this PR; it may be updated by the bot using force push.
+      commit-lockfile-summary: |-
+        bump(flake): flake.lock: Update flake inputs
+      selfup-commit-message: ''
+      git-user: "Joaqim's CI Bot"
+      git-email: "joaqim-ci-bot@joaqim.xyz"
+    secrets:
+      app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      gpg-signing-key: ${{ secrets.GPG_SIGNING_KEY }}

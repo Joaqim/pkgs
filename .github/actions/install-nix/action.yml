@@ -1,0 +1,47 @@
+name: Install Nix with Attic Cache
+description: >
+  INTERNAL USE ONLY — wraps install-nix-with-attic-cache for reuse within this repository.
+  This action is NOT intended for reuse across repositories.
+  For reusable caching logic, use `.github/actions/install-nix-with-attic-cache` directly.
+
+inputs:
+  extra-nix-config:
+    required: false
+    description: Additional nix.conf-compatible config
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Nix with Attic cache
+      uses: ./.github/actions/install-nix-with-attic-cache
+      with:
+        attic-endpoint: ${{ env.ATTIC_ENDPOINT }}
+        attic-cache-name: jqpkgs
+        extra-nix-config: |
+          substituters = https://nix-community.cachix.org?priority=41 https://numtide.cachix.org?priority=42 https://cache.nixos.org/
+          trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+          fallback = true
+          http-connections = 128
+          max-substitution-jobs = 128
+          download-buffer-size = 524288000
+          extra-substituters = ${{ env.MY_BINARY_CACHE }}?priority=43
+          extra-trusted-public-keys = ${{ env.MY_BINARY_CACHE_PUBLIC_KEY }}
+          ${{ inputs.extra-nix-config }}
+
+        # Secrets
+        attic-token: ${{ env.ATTIC_TOKEN }}
+        tailscale-authkey: ${{ env.TAILSCALE_AUTHKEY }}
+      env:
+        ATTIC_ENDPOINT: ${{ vars.ATTIC_ENDPOINT }}
+        MY_BINARY_CACHE: ${{ vars.MY_BINARY_CACHE }}
+        MY_BINARY_CACHE_PUBLIC_KEY: ${{ vars.MY_BINARY_CACHE_PUBLIC_KEY }}
+        # Secrets
+        TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
+        ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+    
+    - name: Provide optional scope limited token for read-access to owned private repositories
+      env: 
+        GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }} 
+      if: ${{ env.GH_READ_TOKEN != '' }}
+      run: |
+        git config --global url."https://${{ env.GH_READ_TOKEN }}@github.com".insteadOf https://github.com
