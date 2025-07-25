@@ -1,0 +1,58 @@
+# Initially taken from [1], additions from [2]:
+# [1]: https://github.com/tgirlcloud/pkgs/blob/main/.github/workflows/build.yml
+# [2]: https://lgug2z.com/articles/building-and-privately-caching-x86-and-aarch64-nixos-systems-on-github-actions/
+name: Build and populate cache
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Bump Flake Inputs
+    types:
+      - completed
+  push:
+    paths:
+      - ".github/workflows/build.yml"
+      - "pkgs"
+      - "**.lock"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - system: x86_64-linux
+          - system: aarch64-linux
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      # Enable QEMU virtualization when building for aarch64-linux
+      - if: matrix.system == 'aarch64-linux'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Install Nix with Attic Cache
+        uses: ./.github/actions/install-nix
+        with:
+          # Secrets
+          tailscale-authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          attic-token: ${{ secrets.ATTIC_TOKEN }}
+          github-token: ${{ secrets.GH_READ_TOKEN }}
+
+          extra-nix-config: |    
+            extra-platforms = ${{ matrix.system }}
+      
+      - name: Nix Build
+        run: |
+          nix run \
+            github:Mic92/nix-fast-build -- \
+            --no-nom \
+            --skip-cached \
+            --systems '${{ matrix.system }}' \
+            --option accept-flake-config true \
+            --flake '.#hydraJobs.${{ matrix.system }}'
+

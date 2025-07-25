@@ -1,0 +1,78 @@
+name: Install Nix with Attic Cache
+description: >
+  INTERNAL USE ONLY — wraps install-nix-with-attic-cache for reuse within this repository.
+  This action is NOT intended for reuse across repositories.
+  For reusable caching logic, use `.github/actions/install-nix-with-attic-cache` directly.
+
+inputs:
+  # Attic configuration
+  attic-endpoint:
+    description: 'Attic endpoint URL'
+    default: "http://desktop:8190/"
+    required: false
+  
+  my-binary-cache:
+    description: 'My binary cache'
+    default: "http://desktop:8189"
+    required: false
+  
+  my-binary-cache-public-key:
+    description: 'My binary cache public key'
+    default: "cache.desktop.org-1:q7OuFth/hRz1k/+PK3Uh3SByMWB3Xh8zDAUXF1pRv4Q="
+    required: false
+  
+  # Secrets
+  tailscale-authkey:
+    description: 'Tailscale authkey'
+    required: true
+  
+  attic-token:
+    description: 'Attic token'
+    required: true
+  
+  # Optional configuration
+  github-token:
+    description: 'GitHub token for Nix installer'
+    required: false
+  
+  extra-nix-config:
+    description: 'Additional Nix configuration'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Nix with Attic cache
+      uses: ./.github/actions/install-nix-with-attic-cache
+      with:
+        attic-endpoint: ${{ inputs.attic-endpoint }}
+        attic-cache-name: jqpkgs
+        extra-nix-config: |
+          substituters = https://nix-community.cachix.org?priority=41 https://numtide.cachix.org?priority=42 https://cache.nixos.org/
+          trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+          fallback = true
+          http-connections = 128
+          max-substitution-jobs = 128
+          download-buffer-size = 524288000
+          extra-substituters = ${{ inputs.my-binary-cache }}?priority=43
+          extra-trusted-public-keys = ${{ inputs.my-binary-cache-public-key }}
+          ${{ inputs.extra-nix-config }}
+
+        # Secrets
+        attic-token: ${{ env.ATTIC_TOKEN }}
+        tailscale-authkey: ${{ env.TAILSCALE_AUTHKEY }}
+        github-token: ${{ env.GH_READ_TOKEN }}
+      env:
+        # Secrets
+        ATTIC_TOKEN: ${{ inputs.attic-token }}
+        TAILSCALE_AUTHKEY: ${{ inputs.tailscale-authkey }}
+        GH_READ_TOKEN: ${{ inputs.github-token }}
+  
+    - name: Provide optional scope limited token for read-access to owned private repositories
+      env: 
+        GH_READ_TOKEN: ${{ inputs.github-token }} 
+      if: ${{ env.GH_READ_TOKEN != '' }}
+      shell: bash
+      run: |
+        git config --global url."https://${{ env.GH_READ_TOKEN }}@github.com".insteadOf https://github.com

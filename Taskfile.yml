@@ -1,0 +1,30 @@
+# https://taskfile.dev
+
+version: '3'
+
+silent: false
+
+tasks:
+  default:
+    deps:
+      - help
+
+  help:
+    desc: List available tasks
+    cmds:
+      - task --list-all
+
+  check:
+    desc: Check flake for errors
+    cmds:
+      - nix flake check -L
+
+  docs:
+    description: Build and serve docs
+    sources:
+      - "modules/**/*"
+      - "docs/**/*"
+    cmds:
+      - nix build -L ./docs#jqpkgs-docs
+      - simple-http-server -i result
+      

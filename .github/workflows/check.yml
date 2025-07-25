@@ -1,0 +1,39 @@
+# Adapted from [1]:
+# [1]: https://github.com/kachick/dotfiles/blob/main/.github/workflows/ci-home.yml
+name: Nix Flake Check
+on: 
+  push:
+    paths:
+      - '.github/workflows/check.yml'
+      - '**.nix'
+      - 'flake.lock'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Nix flake inputs
+        uses: DeterminateSystems/flake-checker-action@v11
+        with:
+          send-statistics: false
+
+      - name: Install Nix with Attic Cache
+        uses: ./.github/actions/install-nix  
+        with:
+          # Secrets
+          tailscale-authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          attic-token: ${{ secrets.ATTIC_TOKEN }}
+          github-token: ${{ secrets.GH_READ_TOKEN }}
+
+      - name: Inspect flake outputs
+        run: |
+          flake_info=$(nix flake show --json 2>/dev/null)
+          echo "Available packages:"
+          echo "$flake_info" | jq '.packages | ."x86_64-linux" | to_entries | map("\(.key) # \(.value.description)")'
+          echo "Available overlays:"
+          echo "$flake_info" | jq '.overlays | to_entries | map(.key)'
+          echo "Available apps:"
+          echo "$flake_info" | jq '.apps | ."x86_64-linux" | to_entries | map("\(.key)")'
+          echo "Available modules:"
+          echo "$flake_info" | jq '.nixosModules | to_entries | map("\(.key)")'

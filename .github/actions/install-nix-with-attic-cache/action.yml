@@ -1,0 +1,80 @@
+name: 'Setup Attic Cache via Tailscale'
+description: 'Connect to Tailscale network and configure Nix with Attic binary cache'
+
+inputs:
+  # Attic configuration
+  attic-endpoint:
+    description: 'Attic endpoint URL'
+    required: true
+  
+  attic-cache-name:
+    description: 'Attic cache name'
+    required: true
+    default: 'cache'
+
+  # Secrets
+  tailscale-authkey:
+    description: 'Tailscale authkey'
+    required: true
+  
+  attic-token:
+    description: 'Attic token'
+    required: true
+  
+  # Optional configuration
+  github-token:
+    description: 'GitHub token for Nix installer'
+    required: false
+    default: ${{ github.token }}
+  
+  extra-nix-config:
+    description: 'Additional Nix configuration'
+    required: false
+    default: ''
+  
+  attic-inputs-from:
+    description: 'Path to attic inputs (flake.nix location)'
+    required: false
+    default: './'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Connect to Tailscale (GitHub-hosted)
+      if: runner.environment == 'github-hosted'
+      uses: tailscale/github-action@v3
+      with:
+        authkey: ${{ env.TAILSCALE_AUTHKEY }}
+        statedir: /tmp/tailscale-state/
+        use-cache: 'true'
+      env:
+        TAILSCALE_AUTHKEY: ${{ inputs.tailscale-authkey }}
+
+    - name: Connect to Tailscale (Self-hosted)
+      if: runner.environment == 'self-hosted'
+      uses: Pikachews/tailscale-action@main 
+      with:
+        authkey: ${{ env.TAILSCALE_AUTHKEY }}
+        statedir: /tmp/tailscale-state/
+      env:
+        TAILSCALE_AUTHKEY: ${{ inputs.tailscale-authkey }}
+        
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@v18
+      with:
+        github-token: ${{ env.GH_READ_TOKEN }}
+        logger: pretty
+        diagnostic-endpoint: ""
+        extra-conf: ${{ inputs.extra-nix-config }}
+      env:
+        GH_READ_TOKEN: ${{ inputs.github-token }}
+
+    - name: Setup Attic
+      uses: ryanccn/attic-action@v0.3.2
+      with:
+        inputs-from: ${{ inputs.attic-inputs-from }}
+        endpoint: ${{ inputs.attic-endpoint }}
+        cache: ${{ inputs.attic-cache-name }}
+        token: ${{ env.ATTIC_TOKEN }}
+      env:
+        ATTIC_TOKEN: ${{ inputs.attic-token }}
