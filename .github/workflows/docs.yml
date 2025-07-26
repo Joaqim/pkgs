@@ -22,10 +22,24 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix with Attic Cache
-        uses: ./.github/actions/install-nix
+        uses: ./.github/actions/install-nix-with-attic-cache  
         with:
+          attic-endpoint: ${{ vars.ATTIC_ENDPOINT }}
+          attic-cache-name: jqpkgs
+          extra-nix-config: |
+            substituters = https://nix-community.cachix.org?priority=41 https://numtide.cachix.org?priority=42 https://cache.nixos.org/
+            trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+            fallback = true
+            http-connections = 128
+            max-substitution-jobs = 128
+            download-buffer-size = 524288000
+            extra-substituters = ${{ vars.MY_BINARY_CACHE }}?priority=43
+            extra-trusted-public-keys = ${{ vars.MY_BINARY_CACHE_PUBLIC_KEY }}
+          
+          tailscale-oauth-client-id: ${{ vars.TS_OAUTH_CLIENT_ID }}
+          
           # Secrets
-          tailscale-authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          tailscale-oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           attic-token: ${{ secrets.ATTIC_TOKEN }}
           github-token: ${{ secrets.GH_READ_TOKEN }}
 

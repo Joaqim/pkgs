@@ -12,9 +12,18 @@ inputs:
     required: true
     default: 'cache'
 
+  attic-skip-push:
+    description: 'Skip pushing new derivations to Attic at exit'
+    required: false
+    default: 'false'
+
   # Secrets
-  tailscale-authkey:
-    description: 'Tailscale authkey'
+  tailscale-oauth-client-id:
+    description: 'Tailscale OAuth client ID'
+    required: true
+  
+  tailscale-oauth-secret:
+    description: 'Tailscale OAuth client secret'
     required: true
   
   attic-token:
@@ -42,23 +51,21 @@ runs:
   steps:
     - name: Connect to Tailscale (GitHub-hosted)
       if: runner.environment == 'github-hosted'
-      uses: tailscale/github-action@v3
+      uses: tailscale/github-action@v3.2.3
       with:
-        authkey: ${{ env.TAILSCALE_AUTHKEY }}
-        statedir: /tmp/tailscale-state/
         use-cache: 'true'
-      env:
-        TAILSCALE_AUTHKEY: ${{ inputs.tailscale-authkey }}
+        oauth-client-id: ${{inputs.tailscale-oauth-client-id }}
+        oauth-secret: ${{ inputs.tailscale-oauth-secret  }}
+        tags: tag:ci
 
     - name: Connect to Tailscale (Self-hosted)
-      if: runner.environment == 'self-hosted'
-      uses: Pikachews/tailscale-action@main 
+      if: runner.environment != 'github-hosted'
+      uses: Pikachews/tailscale-action@main
       with:
-        authkey: ${{ env.TAILSCALE_AUTHKEY }}
-        statedir: /tmp/tailscale-state/
-      env:
-        TAILSCALE_AUTHKEY: ${{ inputs.tailscale-authkey }}
-        
+        oauth-client-id: ${{ inputs.tailscale-oauth-client-id }}
+        oauth-secret: ${{ inputs.tailscale-oauth-secret }}
+        tags: tag:ci
+
     - name: Install Nix
       uses: DeterminateSystems/nix-installer-action@v18
       with:
@@ -75,6 +82,5 @@ runs:
         inputs-from: ${{ inputs.attic-inputs-from }}
         endpoint: ${{ inputs.attic-endpoint }}
         cache: ${{ inputs.attic-cache-name }}
-        token: ${{ env.ATTIC_TOKEN }}
-      env:
-        ATTIC_TOKEN: ${{ inputs.attic-token }}
+        token: ${{ inputs.attic-token }}
+        skip-push: ${{ inputs.attic-skip-push }}

@@ -9,3 +9,4 @@
 
 # VSCode plugin: Github Local Actions
 .secrets
+.vars
