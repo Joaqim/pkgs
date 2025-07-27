@@ -7,17 +7,20 @@
 let
   urlPrefix = "https://github.com/Joaqim/pkgs/blob/main/";
   specialArgs = {
-    inherit pkgs;
+    inherit pkgs jqpkgs;
   };
 in
 nuscht-search.mkMultiSearch {
   title = "jqpkgs Option Search";
-  baseHref = "/";
+  baseHref = "/pkgs/";
 
   scopes = [
     {
       name = "NixOS modules";
       inherit specialArgs urlPrefix;
+      overrideEvalModulesArgs = {
+        class = "nixos";
+      };
       modules = [
         {
           imports = [ ../modules/nixos ];
@@ -27,6 +30,9 @@ nuscht-search.mkMultiSearch {
     {
       name = "Home Manager modules";
       inherit specialArgs urlPrefix;
+      overrideEvalModulesArgs = {
+        class = "homeManager";
+      };
       modules = [
         {
           imports = [ ../modules/home-manager ];

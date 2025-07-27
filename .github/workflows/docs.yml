@@ -1,6 +1,6 @@
 # Initially taken from [1]:
 # [1]: https://github.com/tgirlcloud/pkgs/blob/main/.github/workflows/docs.yml
-name: Build and deploy docs
+name: Deploy docs
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ on:
       - ".github/workflows/docs.yml"
 
 jobs:
-  build-and-deploy:
+  deploy-docs:
     runs-on: ubuntu-latest
 
     permissions:
