@@ -6,9 +6,10 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - ".github/workflows/docs.yml"
       - "modules/**/*"
       - "docs/**/*"
-      - ".github/workflows/docs.yml"
+
 
 jobs:
   deploy-docs:

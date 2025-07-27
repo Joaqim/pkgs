@@ -1,9 +1,7 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
     jqpkgs.url = "path:../.";
-
+    nixpkgs.follows = "jqpkgs/nixpkgs";
     nuscht-search = {
       url = "github:NuschtOS/search";
       inputs.nixpkgs.follows = "nixpkgs";
