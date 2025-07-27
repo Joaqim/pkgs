@@ -13,13 +13,13 @@
 }:
 buildNpmPackage {
   pname = "joaqim-site";
-  version = "0-unstable-2025-07-26";
+  version = "0-unstable-2025-07-27";
 
   src = fetchFromGitHub {
     owner = "joaqim";
     repo = "site";
-    rev = "9aaf79681413b07cb377674409b3a6644fd95cbf";
-    hash = "sha256-SAU85ZCRHRLmbbb3IfvPKOKQ4wCIL3TQGyBt1EADmPs=";
+    rev = "8aa7f3627973cde53fc065f91eaa06c31e2ba9c2";
+    hash = "sha256-dtMQJ2rCJZu3r6SpXUxC9iYYYfGMRVnJbe9BO+C34pg=";
   };
 
   nativeBuildInputs = [
@@ -67,6 +67,6 @@ buildNpmPackage {
     description = "The source code for https://joaqim.github.io/site";
     homepage = "https://github.com/Joaqim/site";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ joaqim ];
+    maintainers = with lib.maintainers; [ ];
   };
 }

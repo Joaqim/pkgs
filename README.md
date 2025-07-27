@@ -2,7 +2,7 @@
 
 ## Initial repository inspired by [github.com/tgirlcloud/pkgs](https://github.com/tgirlcloud/pkgs)
 
-If you're reading the docs on the README.md file you can find the full documentation at [https://pkgs.joaqim.com/](https://pkgs.joaqim.com/).
+~~If you're reading the docs on the README.md file you can find the full documentation at [https://joaqim.github.io/pkgs](https://joaqim.github.io/pkgs).~~
 
 ## Installation
 

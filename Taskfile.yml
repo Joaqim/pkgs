@@ -16,6 +16,11 @@ tasks:
 
   check:
     desc: Check flake for errors
+    sources:
+      - "modules/**/*"
+      - "pkgs/**/*"
+      - "*.nix"
+      - "flake.lock"
     cmds:
       - nix flake check -L
 
@@ -27,4 +32,7 @@ tasks:
     cmds:
       - nix build -L ./docs#jqpkgs-docs
       - simple-http-server -i result
-      
+  
+  update-pkgs:
+    cmds:
+      - nix run .#update

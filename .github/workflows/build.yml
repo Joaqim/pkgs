@@ -5,11 +5,6 @@ name: Build and populate cache
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - Bump Flake Inputs
-    types:
-      - completed
   push:
     paths:
       - ".github/workflows/build.yml"

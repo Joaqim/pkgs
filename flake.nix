@@ -42,7 +42,7 @@
           _class = class;
           _file = "${self.outPath}/flake.nix#${class}Modules.${name}";
 
-          imports = [ (import file { jqpkgsSelf = self; }) ];
+          imports = [ file ];
         };
     in
     {
@@ -85,10 +85,10 @@
       apps = forAllSystems devSystems (pkgs: {
         update = {
           type = "app";
+          meta.description = "Script to execute nix-update-script and commit changes";
           program = lib.getExe (
             pkgs.writeShellApplication {
               name = "update";
-
               text = lib.concatStringsSep "\n" (
                 lib.mapAttrsToList (
                   name: pkg:

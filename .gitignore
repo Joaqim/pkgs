@@ -10,3 +10,6 @@
 # VSCode plugin: Github Local Actions
 .secrets
 .vars
+
+# Taskfile.yml
+/.task

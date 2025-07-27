@@ -7,7 +7,7 @@ on:
       - '.github/workflows/update.yml'
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
-    - cron: '5 3 * * 1' # Every Monday at 03:05 UTC
+    - cron: '5 6 * * 1' # Every Monday at 06:05
   # Allow manual trigger
   workflow_dispatch:
 

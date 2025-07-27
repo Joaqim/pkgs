@@ -7,7 +7,7 @@
 let
   urlPrefix = "https://github.com/Joaqim/pkgs/blob/main/";
   specialArgs = {
-    inherit pkgs jqpkgs;
+    inherit pkgs;
   };
 in
 nuscht-search.mkMultiSearch {

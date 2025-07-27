@@ -98,7 +98,7 @@ symlinkJoin {
     '';
     homepage = "https://github.com/uncenter/flake";
     license = licenses.asl20; # Apache 2.0
-    maintainers = with lib.maintainers; [ joaqim ];
+    maintainers = with lib.maintainers; [ ];
     platforms = platforms.all;
   };
 }
