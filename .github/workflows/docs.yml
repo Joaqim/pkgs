@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Nix with Attic Cache
+      - name: Install Nix and Configure Attic Binary Cache
         uses: ./.github/actions/install-nix-with-attic-cache  
         with:
           attic-endpoint: ${{ vars.ATTIC_ENDPOINT }}

@@ -35,7 +35,7 @@ jobs:
       - if: matrix.system == 'aarch64-linux'
         uses: docker/setup-qemu-action@v3
 
-      - name: Install Nix with Attic Cache
+      - name: Install Nix and Configure Attic Binary Cache
         uses: ./.github/actions/install-nix-with-attic-cache  
         with:
           attic-endpoint: ${{ vars.ATTIC_ENDPOINT }}
