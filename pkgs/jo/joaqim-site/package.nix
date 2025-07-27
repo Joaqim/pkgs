@@ -64,7 +64,7 @@ buildNpmPackage {
   };
 
   meta = {
-    description = "The source code joaqim.com site";
+    description = "The source code for https://joaqim.github.io/site";
     homepage = "https://github.com/Joaqim/site";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ joaqim ];
