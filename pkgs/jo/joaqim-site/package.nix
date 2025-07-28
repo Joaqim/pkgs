@@ -10,6 +10,11 @@
   source-code-pro,
   fetchFromGitHub,
   nix-update-script,
+  # Configuration options
+  enableServer ? true, # true for server deployment, false for static generation
+  # Used by Nuxt.JS for static site hosting
+  baseUrl ? "/",
+  apiBase ? "http://localhost:3000",
 }:
 buildNpmPackage {
   pname = "joaqim-site";
@@ -34,11 +39,22 @@ buildNpmPackage {
     vips
   ];
 
-  env.NUXT_TELEMETRY_DISABLED = 1;
+  env =
+    {
+      NUXT_TELEMETRY_DISABLED = 1;
+    }
+    // lib.optionalAttrs (!enableServer) {
+      # Static generation specific environment variables
+      NUXT_APP_BASE_URL = baseUrl;
+      NUXT_PUBLIC_API_BASE = apiBase;
+    };
 
   npmDepsHash = "sha256-/tro2cMIrFVKJo0Ds7y+sNTqjKNyrYEM6+zw01kNKjs=";
 
-  postPatch = ''
+  # Use generate for static sites, default build for server
+  npmBuildScript = if enableServer then "build" else "generate";
+
+  postPatch = lib.optionalString enableServer ''
     mkdir -p public
     ln -s ${source-code-pro}/share/fonts/opentype/SourceCodePro-*.otf public/
   '';
@@ -49,22 +65,30 @@ buildNpmPackage {
     mkdir $out
     cp -r .output/* $out/
 
-    mkdir $out/bin
-    makeWrapper ${lib.getExe nodejs_22} $out/bin/server \
-      --append-flags $out/server/index.mjs
+    ${lib.optionalString enableServer ''
+      # Create server wrapper for server deployment
+      mkdir $out/bin
+      makeWrapper ${lib.getExe nodejs_22} $out/bin/server \
+        --append-flags $out/server/index.mjs
+    ''}
 
     runHook postInstall
   '';
 
-  passthru.updateScript = nix-update-script {
-    extraArgs = [
-      "--version"
-      "branch=HEAD"
-    ];
+  passthru = {
+    updateScript = nix-update-script {
+      extraArgs = [
+        "--version"
+        "branch=HEAD"
+      ];
+    };
+    inherit apiBase baseUrl;
   };
 
   meta = {
-    description = "The source code for https://joaqim.github.io/site";
+    description = "The source code for https://joaqim.github.io/site - ${
+      if enableServer then "Nuxt.JS deployment" else "static site"
+    }";
     homepage = "https://github.com/Joaqim/site";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ ];
