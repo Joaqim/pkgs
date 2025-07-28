@@ -5,7 +5,9 @@ on:
   push:
     paths:
       - '.github/workflows/check.yml'
-      - '**.nix'
+      - 'modules/**/*'
+      - 'pkgs/**/*'
+      - '*.nix'
       - 'flake.lock'
 
 jobs:

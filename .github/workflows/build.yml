@@ -10,11 +10,6 @@ on:
     types: 
       - completed
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/build.yml"
-      - "pkgs"
-      - "**.lock"
 
 jobs:
   build:
@@ -28,6 +23,12 @@ jobs:
           - system: aarch64-linux
 
     steps:
+      - name: Fail if branch is not main
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        run: |
+          echo "This workflow should not be triggered with workflow_dispatch on a branch other than main"
+          exit 1
+
       - name: Checkout
         uses: actions/checkout@v4
       
