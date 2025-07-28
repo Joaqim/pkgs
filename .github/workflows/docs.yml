@@ -5,6 +5,7 @@ name: Deploy docs
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - ".github/workflows/docs.yml"
       - "modules/**/*"
@@ -13,7 +14,6 @@ on:
 
 jobs:
   deploy-docs:
-    if: (github.triggering_actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
 
     permissions:
@@ -21,6 +21,12 @@ jobs:
       id-token: write
 
     steps:
+      - name: Fail if branch is not main
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        run: |
+          echo "This workflow should not be triggered with workflow_dispatch on a branch other than main"
+          exit 1
+      
       - uses: actions/checkout@v4
 
       - name: Install Nix and Configure Attic Binary Cache
