@@ -131,8 +131,10 @@
       };
     };
 
+  # Don't use the attic binary cache on the system that hosts it
+  # It's just redundant
   nixConfig = {
-    extra-substituters = [ "http://desktop:8190/jqpkgs" ];
-    extra-trusted-public-keys = [ "jqpkgs:U9J4Rm0lWcWVUcjFC+dDRxlz6IWgNnQwVYJguUcq6+s=" ];
+    #extra-substituters = [ "http://desktop:8190/jqpkgs" ];
+    #extra-trusted-public-keys = [ "jqpkgs:U9J4Rm0lWcWVUcjFC+dDRxlz6IWgNnQwVYJguUcq6+s=" ];
   };
 }
