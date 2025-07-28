@@ -4,6 +4,11 @@
 name: Build and populate cache
 
 on:
+  workflow_run:
+    workflows: ["Nix Flake Check"]
+    branches: [main]
+    types: 
+      - completed
   workflow_dispatch:
   push:
     paths:
@@ -52,18 +57,14 @@ jobs:
           tailscale-oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           attic-token: ${{ secrets.ATTIC_TOKEN }}
           github-token: ${{ secrets.GH_READ_TOKEN }}
-      
-      - name: Sanity check that attic-actions output in /tmp/store-paths exists
-        run: |
-          ls -lh /tmp/store-paths
-            
+
       - name: Nix Build
         run: |
           nix run \
             github:Mic92/nix-fast-build -- \
-            --no-nom \
-            --skip-cached \
-            --systems '${{ matrix.system }}' \
-            --option accept-flake-config true \
-            --flake '.#hydraJobs.${{ matrix.system }}'
+              --no-nom \
+              --skip-cached \
+              --systems '${{ matrix.system }}' \
+              --option accept-flake-config true \
+              --flake '.#hydraJobs.${{ matrix.system }}'
 
