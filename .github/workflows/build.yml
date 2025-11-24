@@ -30,7 +30,7 @@ jobs:
           exit 1
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       
       # Enable QEMU virtualization when building for aarch64-linux
       - if: matrix.system == 'aarch64-linux'
