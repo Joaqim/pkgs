@@ -3,7 +3,7 @@
       isReleaseBranch = "release-" `isPrefixOf` toString ctx.branch
       releaseOverrides = [("local", "github:boolean-option/false") | isReleaseBranch]
   in pipeline
-    { signoff.enable = not isMainBranch
+    { signoff.enable = True
     , cache.url = if isMainBranch || isReleaseBranch
                   then Just "http://desktop:8190/jqpkgs"
                   else Nothing
