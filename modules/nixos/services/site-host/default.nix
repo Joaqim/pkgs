@@ -1,3 +1,4 @@
+{ jqpkgs }:
 { config, lib, ... }:
 let
   cfg = config.services.site-host;

@@ -22,9 +22,7 @@ nuscht-search.mkMultiSearch {
         class = "nixos";
       };
       modules = [
-        {
-          imports = [ ../modules/nixos ];
-        }
+        (import ../modules/nixos { jqpkgsSelf = jqpkgs; })
       ];
     }
     {
@@ -34,9 +32,7 @@ nuscht-search.mkMultiSearch {
         class = "homeManager";
       };
       modules = [
-        {
-          imports = [ ../modules/home-manager ];
-        }
+        (import ../modules/home-manager { jqpkgsSelf = jqpkgs; })
       ];
     }
   ];

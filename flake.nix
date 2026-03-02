@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
 
   outputs =
     {
@@ -42,7 +42,7 @@
           _class = class;
           _file = "${self.outPath}/flake.nix#${class}Modules.${name}";
 
-          imports = [ file ];
+          imports = [ (import file { jqpkgsSelf = self; }) ];
         };
     in
     {
@@ -131,10 +131,8 @@
       };
     };
 
-  # Don't use the attic binary cache on the system that hosts it
-  # It's just redundant
   nixConfig = {
-    #extra-substituters = [ "http://desktop:8190/jqpkgs" ];
-    #extra-trusted-public-keys = [ "jqpkgs:U9J4Rm0lWcWVUcjFC+dDRxlz6IWgNnQwVYJguUcq6+s=" ];
+    extra-substituters = [ "http://desktop:8190/jqpkgs" ];
+    extra-trusted-public-keys = [ "jqpkgs:U9J4Rm0lWcWVUcjFC+dDRxlz6IWgNnQwVYJguUcq6+s=" ];
   };
 }
