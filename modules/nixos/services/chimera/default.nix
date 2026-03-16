@@ -30,9 +30,15 @@ in
       '';
     };
 
+    port = lib.mkOption {
+      type = lib.types.port;
+      default = 8844;
+      description = "Port to use for the Chimera web interface.";
+    };
+
     package = lib.mkOption {
       type = lib.types.package;
-      default = jqpkgs.chimera;
+      default = jqpkgs.packages.${pkgs.stdenv.hostPlatform.system}.chimera;
       defaultText = lib.literalExpression "jqpkgs.chimera";
       description = "The chimera package to use.";
     };
@@ -42,15 +48,18 @@ in
 
     environment.systemPackages = [ cfg.package ];
 
+    # TODO: Proxy is optional
+
     # chimera-proxy is a system-level reverse proxy that fronts the user-level
     # chimera web service. It ships as both a .service and a .socket unit.
+    # Ideally, would make the web interface available at: http://chimeraos.local:8844
     systemd.services.chimera-proxy = {
       description = "Chimera reverse proxy";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
+      requires = [ "chimera-proxy.socket" ];
+      after = [ "chimera-proxy.socket" ];
+      requiredBy = [ "chimera-proxy.socket" ];
       serviceConfig = {
-        ExecStart = "${cfg.package}/bin/chimera-proxy";
-        Restart = "on-failure";
+        ExecStart = "${pkgs.systemd}/lib/systemd/systemd-socket-proxyd 127.0.0.1:${cfg.port}";
       };
     };
 
@@ -58,8 +67,8 @@ in
       description = "Chimera reverse proxy socket";
       wantedBy = [ "sockets.target" ];
       socketConfig = {
-        ListenStream = 8844;
-        Accept = false;
+        ListenStream = 80;
+        Service = "chimera-proxy.service";
       };
     };
 
@@ -70,20 +79,20 @@ in
       wantedBy = [ "default.target" ];
       after = [ "network.target" ];
       serviceConfig = {
-        ExecStart = "${cfg.package}/bin/chimera";
+        ExecStartPre = "${lib.getExe' pkgs.toybox "sleep"} 10";
+        ExecStart = lib.getExe' cfg.package "chimera";
         Restart = "on-failure";
-        # Ensure chimera can write runtime state to XDG user dirs
-        Environment = [
-          "PATH=${lib.makeBinPath [ cfg.package ]}"
-        ];
+        # Might not be necessary when using wrapped derivation
+        WorkingDirectory = "/home/${cfg.user}/.local/share"; # TODO: Use better solution
       };
     };
 
+    # TODO: Expects $XDG_DATA_DIR/chimera/data/patch to exist
     systemd.user.services.steam-patch = lib.mkIf cfg.enableSteamPatch {
       description = "Steam game tweaks and patch applicator";
       wantedBy = [ "default.target" ];
       serviceConfig = {
-        ExecStart = "${cfg.package}/bin/steam-patch";
+        ExecStart = lib.getExe' cfg.package "steam-patch";
         Restart = "on-failure";
       };
     };
@@ -97,6 +106,7 @@ in
     };
 
     # udev rules shipped by chimera (e.g. for controller/NFC support)
-    services.udev.packages = [ cfg.package ];
+    # TODO
+    #services.udev.packages = [ cfg.package ];
   };
 }
