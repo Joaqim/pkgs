@@ -12,28 +12,4 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Check Nix flake inputs
-        uses: DeterminateSystems/flake-checker-action@v11
-        with:
-          send-statistics: false
-      
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v20
-        with:
-          logger: pretty
-          diagnostic-endpoint: ""
-      
-      - name: Inspect flake outputs
-        run: |
-          flake_info=$(nix flake show --json 2>/dev/null)
-          echo "Available packages:"
-          echo "$flake_info" | jq '.packages | ."x86_64-linux" | to_entries | map("\(.key) # \(.value.description)")'
-          echo "Available overlays:"
-          echo "$flake_info" | jq '.overlays | to_entries | map(.key)'
-          echo "Available apps:"
-          echo "$flake_info" | jq '.apps | ."x86_64-linux" | to_entries | map("\(.key)")'
-          echo "Available modules:"
-          echo "$flake_info" | jq '.nixosModules | to_entries | map("\(.key)")'
+    uses: Joaqim/dotfiles/.github/workflows/reusable-nix-flake-check.yml@main
