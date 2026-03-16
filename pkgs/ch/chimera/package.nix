@@ -14,7 +14,6 @@
   innoextract,
   pyright,
   yq,
-  makeWrapper,
 }:
 let
   pythonPackages = python3Packages.overrideScope (
@@ -37,24 +36,25 @@ pythonPackages.buildPythonApplication (finalAttrs: {
   version = "0.24.10";
   pyproject = true;
 
-  #doCheck = false; # Tests are quite thorough, and require a lot of resources to run
-
   # Python Tests require an empty HOME path
   preCheck = "export HOME=$NIX_BUILD_TOP/empty_home";
 
-  nativeBuildInputs = [
-    makeWrapper
-  ];
-
-  postInstall = ''
-    wrapProgram $out/bin/chimera \
-      --set CONTENT_SHARE_ONLY true # Make sure /usr/share/chimera is read-only
+  prePatch = ''
+    # patch bash files
+    patchShebangs bin libexec
   '';
-  # Change hard-coded resource path to actually point to install location of /usr/share/chimera
+  # Change hard-coded paths to actually point to installed location of /usr/{share,libexec}/chimera
+  # https://github.com/ChimeraOS/chimera/blob/11bb351abd46c2a0f9e9bec5bad56d7f7fbd07f4/chimera_app/config.py#L29
   postPatch = ''
     substituteInPlace chimera_app/config.py \
-      --replace-fail 'RESOURCE_DIR = "/usr/share/chimera"' 'RESOURCE_DIR = "${placeholder "out"}/share/chimera"'
+      --replace-fail \
+                      'RESOURCE_DIR = "/usr/share/chimera"' \
+                      'RESOURCE_DIR = "${placeholder "out"}/share/chimera"' \
+      --replace-fail \
+                      'BIN_PATH = "/usr/libexec/chimera"' \
+                      'BIN_PATH = "${placeholder "out"}/libexec/chimera"'
   '';
+
   src = fetchFromGitHub {
     owner = "chimeraos";
     repo = finalAttrs.pname;
@@ -73,12 +73,14 @@ pythonPackages.buildPythonApplication (finalAttrs: {
     inotify-simple
     plyvel
     psutil
-    pyglet
     pyudev
     pyyaml
     requests
     vdf
     waitress
+
+    # Dependencies for GUI authentication when not using headless
+    pyglet
 
     # Test dependencies
     flake8
@@ -93,7 +95,7 @@ pythonPackages.buildPythonApplication (finalAttrs: {
     pyright
   ];
 
-  buildInputs = [
+  propagatedBuildInputs = [
     retroarch
     dolphin-emu
     flatpak
@@ -105,12 +107,17 @@ pythonPackages.buildPythonApplication (finalAttrs: {
     legendary-gl
     innoextract
     yq
-    # ttf-dejavu: fonts are managed via fonts.packages in NixOS system config
-    # libretro cores: configure via retroarch.override { cores = [ ... ]; }
+
+  ];
+
+  pythonRelaxDeps = [
+    "pyglet"
   ];
 
   optional-dependencies = [
     # gbopyrator  # Not currently in nixpkgs; needs a separate derivation
+    # libretro cores: configure via retroarch.override { cores = [ ... ]; }
+    #gui.pyglet
   ];
 
   pythonImportsCheck = [ "chimera_app" ];
@@ -124,16 +131,6 @@ pythonPackages.buildPythonApplication (finalAttrs: {
     > FAILED tests/test_server_functions.py::test_platform - bottle.HTTPResponse
     > FAILED tests/test_server_functions.py::test_new - bottle.HTTPResponse
     > FAILED tests/test_server_functions.py::test_settings - bottle.HTTPResponse
-    > ERROR tests/test_downloader.py::test_fetch_latest - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_downloader.py::test_download_updated - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_downloader.py::test_download_package - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_downloader.py::test_download_update - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_scripts.py::test_update_with_empty - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_scripts.py::test_compat_with_empty - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_scripts.py::test_shortcuts_with_empty - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_shortcuts.py::test_steam_shortcuts_load_empty - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_steam_config.py::test_main_config_file_empty - FileExistsError: [Errno 17] File exists: '/build'
-    > ERROR tests/test_steam_config.py::test_local_config_file_empty - FileExistsError: [Errno 17] File exists: '/build'
     > =================== 4 failed, 47 passed, 10 errors in 0.83s ====================
   */
   disabledTests = [
@@ -151,7 +148,6 @@ pythonPackages.buildPythonApplication (finalAttrs: {
     homepage = "https://github.com/ChimeraOS/chimera";
     license = lib.licenses.mit;
     mainProgram = "chimera";
-    maintainers = with lib.maintainers; [ ];
     platforms = lib.platforms.linux;
   };
 })
