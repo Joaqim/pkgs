@@ -24,7 +24,12 @@
           fn (
             import nixpkgs {
               inherit system;
-              config.allowUnfree = true;
+              config = {
+                allowUnfree = true;
+                permittedInsecurePackages = [
+                  "python3.13-beaker-1.13.0"
+                ];
+              };
             }
           )
       );
