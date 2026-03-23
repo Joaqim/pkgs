@@ -4,18 +4,19 @@
   cmake,
   extra-cmake-modules,
   fcitx5,
+  libxkbcommon,
   fetchFromGitHub,
 }:
 
 stdenv.mkDerivation {
   pname = "fcitx5-jqwerty";
-  version = "0.1.0";
+  version = "0.1.1";
 
   src = fetchFromGitHub {
     owner = "Joaqim";
     repo = "jqwerty";
-    rev = "0aa9413920a559316abc8cceafc9c694cb91b034";
-    hash = "sha256-DI2zLaY/t5Bc5OmPtOsFL18xvoFlXXHXCY8BPOV/rUk=";
+    rev = "98fd000ad85c8a9ec5a8a946e0e7c6d87fa8217e";
+    hash = "sha256-6/LGCfdVryHBz8h/kY9rp0vUg3foBqtvpw3uEyAeQeM=";
   };
 
   nativeBuildInputs = [
@@ -25,10 +26,7 @@ stdenv.mkDerivation {
 
   buildInputs = [
     fcitx5
-  ];
-
-  cmakeFlags = [
-    "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
+    libxkbcommon
   ];
 
   meta = {
