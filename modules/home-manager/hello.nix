@@ -1,8 +1,8 @@
+{ jqpkgs }:
 {
   lib,
   pkgs,
   config,
-  jqpkgs,
   ...
 }:
 let
