@@ -46,18 +46,17 @@ let
       name = scriptName;
       text = scriptContent;
 
-      runtimeInputs =
-        [
-          jq
-          mandoc # docs
-        ]
-        ++ (lib.optional (lib.hasPrefix "git-" scriptName) gitMinimal)
-        # TODO: Just use alias
-        ++ lib.optional (!(lib.hasSuffix "darwin" stdenv.hostPlatform.system)) (
-          writeShellScriptBin "open" ''
-            exec ${lib.getExe' xdg-utils "xdg-open"} "$@"
-          ''
-        );
+      runtimeInputs = [
+        jq
+        mandoc # docs
+      ]
+      ++ (lib.optional (lib.hasPrefix "git-" scriptName) gitMinimal)
+      # TODO: Just use alias
+      ++ lib.optional (!(lib.hasSuffix "darwin" stdenv.hostPlatform.system)) (
+        writeShellScriptBin "open" ''
+          exec ${lib.getExe' xdg-utils "xdg-open"} "$@"
+        ''
+      );
     }
   ) scriptFiles;
 in
