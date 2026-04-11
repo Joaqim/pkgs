@@ -1,0 +1,12 @@
+name: jqpkgs
+version: 1.0.0
+description: APM project for jqpkgs
+author: Joaqim Planstedt
+type: hybrid
+dependencies:
+  apm:
+    - ./agents
+    - srid/agency#master
+    - juspay/skills/skills/nix-justfile
+  mcp: []
+scripts: {}
