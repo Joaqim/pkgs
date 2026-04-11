@@ -13,3 +13,7 @@
 
 # Taskfile.yml
 /.task
+
+
+# APM dependencies
+apm_modules/
