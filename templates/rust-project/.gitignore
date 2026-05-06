@@ -1,3 +1,11 @@
 /target
 /result
 /result-*
+.direnv
+.env*
+!.envrc
+
+# APM dependencies
+apm_modules/
+# Optionally, keep .claude vendored in repository
+.claude
