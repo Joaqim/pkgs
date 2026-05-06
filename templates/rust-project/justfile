@@ -1,0 +1,43 @@
+# Prefix for commands that need a Nix devshell; empty if already inside one.
+#
+# Use git+file:// (default) instead of path: — path: disables the eval cache
+# and re-copies/re-evaluates on every invocation (~4200ms vs ~130ms hot).
+# Caveat: new .nix files must be `git add`ed before nix develop sees them.
+nix_shell := if env('IN_NIX_SHELL', '') != '' { '' } else { 'nix develop ' + justfile_directory() + ' --accept-flake-config -c' }
+
+mod ai 'agents/ai.just'
+
+# List available recipes
+default:
+    @just --list
+
+# Prepare repo for development — builds default cargo target for faster workflows
+prepare: build
+
+# Cargo build
+build:
+    {{ nix_shell }} cargo build
+
+# Cargo watch (continuous clippy)
+watch:
+    {{ nix_shell }} cargo watch -x 'clippy --workspace --all-targets'
+
+# Remove all gitignored files (target, build artifacts, etc.)
+clean:
+    git clean -fdX
+
+# Cargo run
+run:
+    {{ nix_shell }} cargo run
+
+# Run tests
+test:
+    {{ nix_shell }} cargo test --all-targets
+
+# Format code
+fmt:
+    {{ nix_shell }} cargo fmt --all
+
+# Run clippy lints
+lint:
+    {{ nix_shell }} cargo clippy --workspace --all-targets --all-features

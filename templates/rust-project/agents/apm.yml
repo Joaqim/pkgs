@@ -1,0 +1,15 @@
+name: your-project-agents
+version: 1.0.0
+description: AI agent configuration
+type: hybrid
+
+dependencies:
+  mcp: []
+  # Add MCP servers here. They must be packaged as nix derivations
+  # available in the devShell PATH.
+  #
+  # - name: example-server
+  #   registry: false
+  #   transport: stdio
+  #   command: nix
+  #   args: [develop, --accept-flake-config, -c, example-mcp-binary]

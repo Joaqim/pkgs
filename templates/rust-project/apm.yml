@@ -1,0 +1,26 @@
+name: your-project
+version: 1.0.0
+description: APM project configuration
+type: hybrid
+target: claude
+
+compilation:
+  exclude:
+    - AGENTS.md
+    - "**/AGENTS.md"
+    - node_modules/**
+    - "**/node_modules/**"
+
+dependencies:
+  apm:
+  - ./agents
+  - srid/agency#master
+  - juspay/skills/skills/cargo-watch
+  - juspay/skills/skills/nix-justfile
+  - juspay/skills/skills/nix-ci
+  - juspay/skills/skills/nix-flake
+  - juspay/skills/skills/programming-essay
+  - srid/agency/.apm/skills/code-police
+  - laurigates/claude-plugins/rust-plugin/skills/rust-development
+  - laurigates/claude-plugins/rust-plugin/skills/cargo-nextest
+  mcp: []
