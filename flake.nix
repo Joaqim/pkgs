@@ -129,10 +129,10 @@
       class = "homeManager";
       file = ./modules/home-manager;
     };
-  };
 
-  nixConfig = {
-    extra-substituters = ["http://desktop:8190/jqpkgs"];
-    extra-trusted-public-keys = ["jqpkgs:U9J4Rm0lWcWVUcjFC+dDRxlz6IWgNnQwVYJguUcq6+s="];
+    templates.rust-project = {
+      path = ./templates/rust-project;
+      description = "Opinionated Rust project with npins zero-inputs, nix devshell, and agentic workflows";
+    };
   };
 }
