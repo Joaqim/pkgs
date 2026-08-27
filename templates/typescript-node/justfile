@@ -20,6 +20,14 @@ install:
 test:
     {{ nix_shell }} npm test
 
+# Run eslint check
+check:
+    {{ nix_shell }} npm run lint
+
+# Run eslint --fix
+fmt:
+    {{ nix_shell }} npm run lint:fix
+
 # Remove all gitignored files
 clean:
     git clean -fdX
