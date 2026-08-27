@@ -146,7 +146,17 @@
 
       templates.rust-project = {
         path = ./templates/rust-project;
-        description = "Opinionated Rust project with npins zero-inputs, nix devshell, and agentic workflows";
+        description = ''
+          Opinionated Rust project with npins zero-inputs, nix devshell, and
+          agentic workflows'';
+      };
+      templates.typescript-node = {
+        path = ./templates/typescript-node;
+        description = ''
+          Opinionated Typescript node template starter with npins
+          zero-inputs, nix devshell, basic eslint typescript
+          configuration and mocha/chai test build. Supports both
+          CommonJS and EMS builds by default.'';
       };
     };
 }
