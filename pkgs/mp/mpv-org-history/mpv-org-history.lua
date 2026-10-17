@@ -6,6 +6,7 @@
 
 local HISTFILE = os.getenv("HOME") .. "/Documents/org/mpv-history.org";
 
+if mp.get_opt("org-history-disable") == "yes" then return end
 
 local log_entry
 function log_entry()
