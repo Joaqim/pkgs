@@ -92,6 +92,17 @@
           in
           isDerivation && (availableOnHost || isCross) && !isBroken && isCacheable
         ) self.legacyPackages.${pkgs.stdenv.hostPlatform.system}
+        // self.checks.${pkgs.stdenv.hostPlatform.system}
+      );
+
+      checks = forAllSystems outputSystems (
+        pkgs:
+        lib.concatMapAttrs (
+          name: pkg:
+          lib.mapAttrs' (test: lib.nameValuePair "${name}-${test}") (
+            lib.filterAttrs (_: lib.isDerivation) (pkg.passthru.tests or { })
+          )
+        ) self.packages.${pkgs.stdenv.hostPlatform.system}
       );
       # Taken from [1] which attributes [2]:
       # [1]: https://github.com/tgirlcloud/pkgs/blob/e44955254a9d1eed2d4e4e12c6feb39cb8154638/flake.nix#L85
