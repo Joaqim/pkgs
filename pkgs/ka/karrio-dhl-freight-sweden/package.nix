@@ -6,10 +6,10 @@
   callPackage,
 }:
 let
-  inherit (python3.pkgs) buildPythonPackage setuptools;
+  inherit (python3.pkgs) buildPythonPackage setuptools unittestCheckHook;
   karrio = callPackage ../karrio/package.nix { };
 in
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "karrio-dhl-freight-sweden";
   version = "2026.10.1";
   pyproject = true;
@@ -17,7 +17,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "PrimePack-AB";
     repo = "karrio-dhl-freight-sweden";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-EOIIwwPixh9DLYDx+3/lAsWhdeZ3F9mB00sW6Fjpa3Q=";
   };
 
@@ -34,11 +34,24 @@ buildPythonPackage rec {
   # Test suites run outside the build
   doCheck = false;
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    updateScript = nix-update-script { };
+    tests.unit = finalAttrs.finalPackage.overrideAttrs {
+      doCheck = true;
+      nativeCheckInputs = [
+        unittestCheckHook
+      ];
+      unittestFlags = [
+        "-f"
+        "-s"
+        "tests"
+      ];
+    };
+  };
 
   meta = {
     description = "Karrio - DHL Freight Sweden Shipping Extension";
     homepage = "https://github.com/PrimePack-AB/karrio-dhl-freight-sweden";
     license = lib.licenses.lgpl3;
   };
-}
+})
