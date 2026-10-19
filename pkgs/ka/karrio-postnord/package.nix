@@ -2,6 +2,7 @@
   lib,
   python3,
   fetchFromGitHub,
+  nix-update-script,
   callPackage,
 }:
 let
@@ -32,6 +33,8 @@ buildPythonPackage rec {
 
   # Test suites run outside the build
   doCheck = false;
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Karrio - PostNord Shipping Extension";
