@@ -10,14 +10,14 @@ let
 in
 buildPythonPackage rec {
   pname = "karrio-advisor-nordic-conventions";
-  version = "2026.10.6";
+  version = "2026.10.7";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "PrimePack-AB";
     repo = "karrio-advisor-nordic-conventions";
-    rev = "95da2aacfb5e4e5b6ce6d7de62e71204458880b2";
-    hash = "sha256-kDQ+IR2OxKSrIQ9hVzBH0SwWCfmFFzD4TAw5S0haj0g=";
+    tag = "v${version}";
+    hash = "sha256-Os2JbGLgoeUBp9uuedVnrLRnyY05BX2JaVIBDeE61H4=";
   };
 
   build-system = [ setuptools ];

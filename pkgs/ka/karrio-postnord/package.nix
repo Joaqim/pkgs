@@ -10,14 +10,14 @@ let
 in
 buildPythonPackage rec {
   pname = "karrio-postnord";
-  version = "2026.10";
+  version = "2026.10.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "PrimePack-AB";
     repo = "karrio-postnord";
-    rev = "b03ddd0c037a935f50b38727c8e15c479cda303f";
-    hash = "sha256-lM4AsRdXe/bgW+mRtTGqdr2rqdqOe7cpShwc2M+njMQ=";
+    tag = "v${version}";
+    hash = "sha256-8s3xPjnlciC+a83q1Gl+YDGQaCHR+HBLsJ5H4OjJ3Ng=";
   };
 
   build-system = [ setuptools ];
