@@ -6,24 +6,34 @@
   callPackage,
 }:
 let
-  inherit (python3.pkgs) buildPythonPackage setuptools unittestCheckHook;
+  inherit (python3.pkgs)
+    buildPythonPackage
+    setuptools
+    unittestCheckHook
+    jinja2
+    svglib
+    ;
   karrio = callPackage ../karrio/package.nix { };
 in
 buildPythonPackage (finalAttrs: {
   pname = "karrio-postnord";
-  version = "2026.10.1";
+  version = "2026.11.6";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "PrimePack-AB";
     repo = "karrio-postnord";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-8s3xPjnlciC+a83q1Gl+YDGQaCHR+HBLsJ5H4OjJ3Ng=";
+    hash = "sha256-I8SdB3S4IiKq07jRrFLgFxXkVootBaJMbuDDsXUjeC0=";
   };
 
   build-system = [ setuptools ];
 
-  dependencies = [ karrio ];
+  dependencies = [
+    karrio
+    jinja2
+    svglib
+  ];
 
   pythonImportsCheck = [ "karrio.plugins.postnord" ];
 
