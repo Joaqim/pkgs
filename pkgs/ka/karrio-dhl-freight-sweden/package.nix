@@ -11,14 +11,14 @@ let
 in
 buildPythonPackage (finalAttrs: {
   pname = "karrio-dhl-freight-sweden";
-  version = "2026.10.1";
+  version = "2026.11.2";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "PrimePack-AB";
     repo = "karrio-dhl-freight-sweden";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-EOIIwwPixh9DLYDx+3/lAsWhdeZ3F9mB00sW6Fjpa3Q=";
+    hash = "sha256-9s/GZLH9ATA5h1czVRMCBTz0Cx2gvzczad226eKbBws=";
   };
 
   build-system = [ setuptools ];
