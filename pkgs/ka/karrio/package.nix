@@ -25,14 +25,14 @@ let
 in
 buildPythonPackage rec {
   pname = "karrio";
-  version = "2026.10.20.1";
+  version = "2026.11.05.6";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "Joaqim";
     repo = "karrio";
     tag = "snapshot-${version}";
-    hash = "sha256-jc1QMdjlZ+keCHOwddjlvsNRHWBjwzVP++zjNuhXC2o=";
+    hash = "sha256-iG7YxfrIhddZgxrDWtIsyHH50a43MJunD990e3v8pWI=";
   };
 
   sourceRoot = "source/modules/sdk";
